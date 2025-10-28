@@ -10,6 +10,7 @@ Extended function
 2. build sharelatex image
 ```sh
 cd overleaf/server-ce/
+chmod +x ./build.sh
 ./build.sh
 ```
 3. initialize

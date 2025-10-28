@@ -1,0 +1,51 @@
+extends ../layout-marketing
+
+block content
+	main#main-content.content.content-alt
+		.container
+			.row
+				.col-lg-6.offset-lg-3.col-xl-4.offset-xl-4
+					.card
+						.card-body
+							.page-header
+								h1 #{translate("sign_up")}
+							form(name='signupForm' action='/sign-up' method='POST')
+								input(name='_csrf' type='hidden' value=csrfToken)
+								+formMessagesNewStyle
+								
+								.form-group
+									label(for='email') #{translate("email")}
+									input#email.form-control(
+										name='email'
+										type='email'
+										required
+										autofocus='true'
+										autocomplete='username'
+									)
+								
+								.form-group
+									label(for='password') #{translate("password")}
+									input#password.form-control(
+										name='password'
+										type='password'
+										required
+										autocomplete='new-password'
+									)
+
+								.form-group
+									label(for='confirmPassword') #{translate("confirm_password")}
+									input#confirmPassword.form-control(
+										name='confirmPassword'
+										type='password'
+										required
+										autocomplete='new-password'
+									)
+
+								.actions
+									button.btn-primary.btn(type='submit' data-ol-disabled-inflight)
+										span(data-ol-inflight='idle') #{translate("sign_up")}
+										span(hidden data-ol-inflight='pending') #{translate("signing_up")}…
+								
+								if signup_support_text
+									hr
+									p.text-center !{signup_support_text}

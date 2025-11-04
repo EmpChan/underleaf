@@ -92,10 +92,7 @@ async function _getSplitTestOptions(req, res) {
         'clsi-cache-prompt'
       ))
     populateClsiCache = variant === 'enabled'
-    if (res.locals.splitTestInfo?.['clsi-cache-prompt']?.active) {
-      // Start using the cache when the split-test for the prompts is activated.
-      compileFromClsiCache = populateClsiCache
-    }
+    compileFromClsiCache = populateClsiCache
   }
 
   const pdfDownloadDomain = Settings.pdfDownloadDomain
@@ -282,12 +279,7 @@ const _CompileController = {
           status,
           compileTime: timings?.compileE2E,
           timeout: limits.timeout,
-          server:
-            clsiServerId?.includes('-c2d-') ||
-            clsiServerId?.includes('-c3d-') ||
-            clsiServerId?.includes('-c4d-')
-              ? 'faster'
-              : 'normal',
+          server: clsiServerId?.includes('-c4d-') ? 'faster' : 'normal',
           clsiServerId,
           isAutoCompile,
           isInitialCompile: stats?.isInitialCompile === 1,

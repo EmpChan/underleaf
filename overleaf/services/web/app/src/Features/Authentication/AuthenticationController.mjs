@@ -623,77 +623,62 @@ const AuthenticationController = {
 
   async handleSignup(req, res, next) {
     try {
-      const { email, password, confirmPassword, first_name, last_name } = req.body
+      const { email, password, confirmPassword } = req.body
 
-      // 1️⃣ 비밀번호 확인
+      // 1) 비밀번호 확인
       if (password !== confirmPassword) {
-        return res.render('user/sign-up', {
-          csrfToken: req.csrfToken(),
-          formMessages: [
-            { type: 'danger', message: '비밀번호가 일치하지 않습니다.' },
-          ],
-        })
+        return res.status(200).json({ error: 'passwordMismatch' })
       }
 
-      // 2️⃣ 이메일 중복 확인
+      // 2) 이메일 중복
       const { default: UserGetter } = await import('../User/UserGetter.js')
       const existing = await new Promise((resolve, reject) => {
-        UserGetter.ensureUniqueEmailAddress(email, err =>
-          err ? reject(err) : resolve(null)
-        )
+        UserGetter.ensureUniqueEmailAddress(email, err => err ? reject(err) : resolve(null))
       }).catch(err => err)
 
       if (existing && existing.message?.includes('already registered')) {
-        return res.render('user/sign-up', {
-          csrfToken: req.csrfToken(),
-          formMessages: [
-            { type: 'danger', message: '이미 등록된 이메일 주소입니다.' },
-          ],
-        })
+        return res.status(200).json({ error: 'duplicateEmail' })
       }
 
-      // 3️⃣ 유저 생성
+      // 3) 도메인 검사
+      const allowedDomains = ['cbnu.ac.kr', 'chungbuk.ac.kr']
+      const isAllowed = allowedDomains.some(d => email.endsWith(d))
+      if (!isAllowed) {
+        return res.status(200).json({ error: 'invalidDomain' })
+      }
+
+      // 4) 생성 + 비번 해시
       const { default: UserCreator } = await import('../User/UserCreator.mjs')
-      const userAttributes = {
-        email,
-        password, // 임시 저장
-      }
-
-      const options = { confirmedAt: new Date() }
-
-      // 1️⃣ 사용자 생성
-      UserCreator.createNewUser(userAttributes, options, async (err, user) => {
-        if (err) {
-          logger.error('User creation failed:', err)
-          return next(err)
-        }
-
-        try {
-          // 2️⃣ 비밀번호 해시 적용
-          await AuthenticationManager.promises.setUserPassword(user, password)
-          logger.info({ email: user.email }, 'user create account and hashed password')
-        } catch (hashErr) {
-          logger.error('Password hashing failed:', hashErr)
-          next(hashErr)
-        }
+      const user = await new Promise((resolve, reject) => {
+        UserCreator.createNewUser({ email, password }, { confirmedAt: new Date() }, async (err, user) => {
+          if (err) return reject(err)
+          resolve(user)
+        })
       })
 
-      // 4️⃣ 로그인 세션 저장
-      SessionManager.setUserInSession(req, user)
-      logger.info({ userId: user._id, email: user.email }, 'new user registered')
+      const { default: AuthenticationManager } = await import('../Authentication/AuthenticationManager.js')
+      await AuthenticationManager.promises.setUserPassword(user, password)
 
-      // 5️⃣ 로그인 후 후처리 (hook 재활용)
-      await AuthenticationController._finishLoginAsync(user, req, res)
+      logger.info({ userId: user._id, email: user.email }, 'user signed up')
+      // 5) 성공 → redirect
+      return res.status(200).json({
+        user: true,
+        redirect: '/login',
+        key: 'signupSuccess'                
+      })
+
     } catch (err) {
-      logger.error({ err }, '[sign-up error]')
-      return res.render('user/sign-up', {
-        csrfToken: req.csrfToken(),
-        formMessages: [
-          { type: 'danger', message: '회원가입 중 오류가 발생했습니다.' },
-        ],
+      logger.err({ err }, 'error during signup process')
+      if (res.headersSent) {
+        return
+      }
+      // 실패도 200 + key
+      return res.status(200).json({
+        user: false,
+        info: { type: 'error', key: 'generalError' }
       })
     }
-  },
+  }
 }
 
 function _afterLoginSessionSetup(req, user, callback) {

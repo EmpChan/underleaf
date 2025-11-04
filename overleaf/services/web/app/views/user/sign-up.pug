@@ -11,7 +11,6 @@ block content
 								h1 #{translate("sign_up")}
 							form(name='signupForm' action='/sign-up' method='POST')
 								input(name='_csrf' type='hidden' value=csrfToken)
-								+formMessagesNewStyle
 								
 								.form-group
 									label(for='email') #{translate("email")}
@@ -46,6 +45,45 @@ block content
 										span(data-ol-inflight='idle') #{translate("sign_up")}
 										span(hidden data-ol-inflight='pending') #{translate("signing_up")}…
 								
-								if signup_support_text
-									hr
-									p.text-center !{signup_support_text}
+							script(nonce=scriptNonce).
+								(function () {
+									const form = document.querySelector('form[name="signupForm"]')
+									if (!form) return
+
+									form.addEventListener('submit', async e => {
+										e.preventDefault();
+
+										const params = new URLSearchParams(new FormData(form));
+										const res = await fetch(form.action, {
+											method: 'POST',
+											body: params,
+											headers: {
+												'Accept': 'application/json',
+												'Content-Type': 'application/x-www-form-urlencoded'
+											}
+										});
+										const text = await res.text();
+										let data = {};
+										try { data = JSON.parse(text) } catch {}
+										console.log('Signup response data:', data);
+										console.log('Signup response info:', data.info);
+										console.log('Signup response error:', data.error);
+										console.log('Signup response redirect:', data.redirect);
+										if (data.redirect) {
+											window.location.assign(data.redirect);
+											return // 여기서 종료
+										}
+
+										const key = data.error || data?.info?.key
+										console.log('Signup response key:', key);
+
+										const MSG = {
+											passwordMismatch: '비밀번호가 일치하지 않습니다.',
+											duplicateEmail: '이미 등록된 이메일 주소입니다.',
+											invalidDomain: '허용된 이메일 도메인만 사용할 수 있습니다.',
+											generalError: '회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+										}
+
+										alert(MSG[key] || MSG.generalError)
+										});
+								})()

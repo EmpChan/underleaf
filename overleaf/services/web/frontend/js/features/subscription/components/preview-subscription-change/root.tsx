@@ -23,6 +23,7 @@ import { useFeatureFlag } from '@/shared/context/split-test-context'
 import PaymentErrorNotification from '@/features/subscription/components/shared/payment-error-notification'
 import handleStripePaymentAction from '../../util/handle-stripe-payment-action'
 import RedirectedPaymentErrorNotification from '../shared/redirected-payment-error-notification'
+import TrialDisabledNotification from './trial-disabled-notification'
 
 function PreviewSubscriptionChange() {
   const preview = getMeta(
@@ -39,6 +40,7 @@ function PreviewSubscriptionChange() {
     (item, index, arr) => {
       if (!item.isAiAssist) return true
 
+      // TODO: this can be removed when all subscriptions are using Stripe
       const isCanceledByAnotherItem = arr.some(
         (otherItem, otherIndex) =>
           otherIndex !== index &&
@@ -100,6 +102,7 @@ function PreviewSubscriptionChange() {
       <OLRow>
         <OLCol md={{ offset: 2, span: 8 }}>
           <RedirectedPaymentErrorNotification />
+          <TrialDisabledNotification />
           <OLCard className="p-3">
             {preview.change.type === 'add-on-purchase' ? (
               <h1>

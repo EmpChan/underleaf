@@ -1039,7 +1039,6 @@ module.exports = {
   },
 
   moduleImportSequence: [
-'track-changes',
     'history-v1',
     'launchpad',
     'server-ce-scripts',

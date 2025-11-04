@@ -83,7 +83,10 @@ block content
 											invalidDomain: '허용된 이메일 도메인만 사용할 수 있습니다.',
 											generalError: '회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
 										}
-
+										if (data.msg){
+											alert(data.msg);
+											return;
+										}
 										alert(MSG[key] || MSG.generalError)
 										});
 								})()

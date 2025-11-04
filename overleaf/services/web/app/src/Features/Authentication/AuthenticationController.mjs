@@ -647,7 +647,22 @@ const AuthenticationController = {
         return res.status(200).json({ error: 'invalidDomain' })
       }
 
-      // 4) 생성 + 비번 해시
+      // 4) 비번 사용 가능 여부
+      const { default: AuthenticationManager } = await import('../Authentication/AuthenticationManager.js')
+      try {
+        var result = await AuthenticationManager.promises.validatePassword(password, email)
+        if(result.message){
+          logger.info({ email }, 'password validation failed during signup')
+          return res.status(200).json({
+            user: false,
+            key : 'invalidPassword',
+            msg : result.message,
+          })
+        }
+      }
+      catch (err) {}
+      
+      // 5) 생성 + 비번 해시
       const { default: UserCreator } = await import('../User/UserCreator.mjs')
       const user = await new Promise((resolve, reject) => {
         UserCreator.createNewUser({ email, password }, { confirmedAt: new Date() }, async (err, user) => {
@@ -656,7 +671,6 @@ const AuthenticationController = {
         })
       })
 
-      const { default: AuthenticationManager } = await import('../Authentication/AuthenticationManager.js')
       await AuthenticationManager.promises.setUserPassword(user, password)
 
       logger.info({ userId: user._id, email: user.email }, 'user signed up')

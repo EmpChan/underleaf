@@ -9,3 +9,6 @@ config/**/*
 
 data/**/*
 !data/.gitkeep
+
+lib/*
+bin/*

@@ -54,39 +54,6 @@ function ThinFooter({
 
   return (
     <footer className="site-footer">
-      <div className="site-footer-content d-print-none">
-        <OLRow>
-          <ul className="site-footer-items col-lg-9">
-            {showPoweredBy ? (
-              <>
-                <li>
-                  {/* year of Server Pro release, static */}© 2025{' '}
-                  <a href="https://www.overleaf.com/for/enterprises">
-                    Powered by Overleaf
-                  </a>
-                </li>
-                {showLanguagePicker || hasCustomLeftNav ? <Separator /> : null}
-              </>
-            ) : null}
-            {showLanguagePicker ? (
-              <>
-                <li>
-                  <LanguagePicker showHeader />
-                </li>
-                {hasCustomLeftNav ? <Separator /> : null}
-              </>
-            ) : null}
-            {leftItems?.map(item => (
-              <FooterItemLi key={item.text} {...item} />
-            ))}
-          </ul>
-          <ul className="site-footer-items col-lg-3 text-end">
-            {rightItems?.map(item => (
-              <FooterItemLi key={item.text} {...item} />
-            ))}
-          </ul>
-        </OLRow>
-      </div>
     </footer>
   )
 }

@@ -60,7 +60,7 @@ function ThinFooter({
             {showPoweredBy ? (
               <>
                 <li>
-                  문의 : overlatex@gmail.com
+                  문의 : overlatex@googlegroups.com
                 </li>
                 {showLanguagePicker || hasCustomLeftNav ? <Separator /> : null}
               </>

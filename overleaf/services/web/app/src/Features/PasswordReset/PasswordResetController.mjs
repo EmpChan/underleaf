@@ -235,7 +235,7 @@ async function renderRequestResetForm(req, res) {
     error = 'password_reset_token_expired'
   }
 
-  res.render('user/passwordReset', {
+  res.render('user/passwordResetInfo', {
     title: 'reset_password',
     error,
   })

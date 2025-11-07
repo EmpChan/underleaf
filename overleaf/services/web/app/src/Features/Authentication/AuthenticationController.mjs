@@ -641,7 +641,7 @@ const AuthenticationController = {
       }
 
       // 3) 도메인 검사
-      const allowedDomains = ['cbnu.ac.kr', 'chungbuk.ac.kr']
+      const allowedDomains = ['cbnu.ac.kr', 'chungbuk.ac.kr', 'kaist.ac.kr']
       const isAllowed = allowedDomains.some(d => email.endsWith(d))
       if (!isAllowed) {
         return res.status(200).json({ error: 'invalidDomain' })

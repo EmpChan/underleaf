@@ -47,7 +47,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # # docker build \
 #     --build-arg TEXLIVE_MIRROR=https://ctan.crest.fr/tex-archive/systems/texlive/tlnet \
 #     -f Dockerfile-base -t sharelatex/sharelatex-base .
-ARG TEXLIVE_MIRROR=https://mirror.ox.ac.uk/sites/ctan.org/systems/texlive/tlnet
+ARG TEXLIVE_MIRROR=https://ctan.math.washington.edu/tex-archive/systems/texlive/tlnet
 
 RUN mkdir /install-tl-unx \
 &&  wget --quiet https://tug.org/texlive/files/texlive.asc \
@@ -89,3 +89,9 @@ RUN adduser --system --group --home /overleaf --no-create-home overleaf && \
 	chown www-data:www-data /var/log/overleaf && \
 	mkdir -p /var/lib/overleaf/data/template_files && \
 	chown www-data:www-data /var/lib/overleaf/data/template_files
+
+# Update texlive server
+# ---------------------
+ RUN tlmgr option repository https://ctan.math.washington.edu/tex-archive/systems/texlive/tlnet && \
+    tlmgr install scheme-full && \
+    tlmgr path add

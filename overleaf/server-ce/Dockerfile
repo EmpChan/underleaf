@@ -112,13 +112,6 @@ ENV GRACEFUL_SHUTDOWN_DELAY_SECONDS=1
 ENV NODE_ENV="production"
 ENV LOG_LEVEL="info"
 
-# Update texlive server
-# ---------------------
-RUN tlmgr option repository https://ctan.math.washington.edu/tex-archive/systems/texlive/tlnet && \
-    tlmgr update --self --all && \
-    tlmgr install scheme-full && \
-    tlmgr path add
-
 EXPOSE 80
 
 ENTRYPOINT ["/sbin/my_init"]

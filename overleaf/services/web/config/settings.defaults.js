@@ -778,11 +778,15 @@ module.exports = {
     title: process.env.APP_NAME || 'Overleaf Community Edition',
 
     hide_powered_by: process.env.NAV_HIDE_POWERED_BY === 'true',
-    left_footer: [],
+    left_footer: [
+      {
+        text: '<p> 문의 : overlatex@googlegroups.com </p>'
+      }
+    ],
 
     right_footer: [
       {
-        text: '<a href="https://github.com/overleaf/overleaf">Fork on GitHub!</a>',
+        text: '<a href="https://cslab.cbnu.ac.kr/">CSLAB!</a>',
       },
     ],
 

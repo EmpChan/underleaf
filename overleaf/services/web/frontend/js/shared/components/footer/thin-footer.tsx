@@ -59,9 +59,6 @@ function ThinFooter({
           <ul className="site-footer-items col-lg-9">
             {showPoweredBy ? (
               <>
-                <li>
-                  문의 : overlatex@googlegroups.com
-                </li>
                 {showLanguagePicker || hasCustomLeftNav ? <Separator /> : null}
               </>
             ) : null}

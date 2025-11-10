@@ -636,7 +636,7 @@ const AuthenticationController = {
         UserGetter.ensureUniqueEmailAddress(email, err => err ? reject(err) : resolve(null))
       }).catch(err => err)
 
-      if (existing && existing.message?.includes('already registered')) {
+      if (existing) {
         return res.status(200).json({ error: 'duplicateEmail' })
       }
 
@@ -652,11 +652,13 @@ const AuthenticationController = {
       try {
         var result = await AuthenticationManager.promises.validatePassword(password, email)
         if(result.message){
-          logger.info({ email }, 'password validation failed during signup')
+          let msg = result.message.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase())
+          logger.info({ email }, 'password validation failed during signup msg = ' + msg)
+          
           return res.status(200).json({
             user: false,
             key : 'invalidPassword',
-            msg : result.message,
+            msg : msg,
           })
         }
       }

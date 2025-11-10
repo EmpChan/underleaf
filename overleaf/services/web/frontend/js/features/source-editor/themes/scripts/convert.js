@@ -223,7 +223,7 @@ for (const themePath of themePaths) {
 
   fs.writeFileSync(outputPath, output + '\n')
 
-  if (basename !== 'overleaf') {
+  if (basename !== 'overlatex') {
     copyLicense(basename)
   }
 }
@@ -235,7 +235,7 @@ function copyLicense(basename) {
     const match = js.match(/\*+ BEGIN LICENSE BLOCK .+? END LICENSE BLOCK \*+/s)
     if (match) {
       const license = match[0].replace(/\n \* ?/g, '\n')
-      const output = `Conversion by Overleaf from Ace to CodeMirror 6.\n\nSource: https://github.com/ajaxorg/ace/\n\nThe theme's original license is copied below:\n\n${license}`
+      const output = `Conversion by Overlatex from Ace to CodeMirror 6.\n\nSource: https://github.com/ajaxorg/ace/\n\nThe theme's original license is copied below:\n\n${license}`
       const licenseOutputPath = path.join(outputDir, `${basename}-license.txt`)
       fs.writeFileSync(licenseOutputPath, output)
     } else {

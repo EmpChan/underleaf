@@ -14,7 +14,7 @@ export default function SettingsPdfViewer() {
       options={[
         {
           value: 'pdfjs',
-          label: t('overleaf'),
+          label: t('overlatex'),
         },
         {
           value: 'native',

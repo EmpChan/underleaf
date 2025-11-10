@@ -12,6 +12,8 @@ import AuthenticationManager from '../Authentication/AuthenticationManager.js'
 import UserCreator from '../User/UserCreator.mjs'
 import UserDeleter from '../User/UserDeleter.mjs'
 import UserGetter from '../User/UserGetter.js'
+import UserController from '../User/UserController.mjs'
+
 
 const AdminController = {
   _sendDisconnectAllUsersMessage: delay => {
@@ -134,16 +136,21 @@ const AdminController = {
   createMessage(req, res, next) {
     SystemMessageManager.createMessage(req.body.content, error => {
       if (error) return next(error)
-      res.redirect('/admin#system-messages')
+      res.redirect('/admin#user-management')
     })
   },
 
   clearMessages(req, res, next) {
     SystemMessageManager.clearMessages(error => {
       if (error) return next(error)
-      res.redirect('/admin#system-messages')
+      res.redirect('/admin#user-management')
     })
   },
+
+  resetUserPassword(req, res, next) {
+    UserController.resetPassword(req, res, next)
+    res.redirect('/admin#admin-password-reset')
+  }
 }
 
 export default AdminController

@@ -65,6 +65,85 @@ async function _ensureAffiliation(userId, emailData) {
   }
 }
 
+async function resetPassword(req, res, next) {
+  if (!req.user.isAdmin){
+    return HttpErrorHandler.forbidden(
+      req,
+      res,
+      req.i18n.translate('only_admins_can_reset_passwords')
+    )
+  }
+  metrics.inc('user.password-reset')
+  const { email } = req.body
+
+  let user
+  try {
+    user = await UserGetter.promises.getUserByMainEmail(email)
+  } catch (error) {
+    logger.warn(
+      { error, email },
+      'error getting user by email during password reset'
+    )
+    // respond with success message to avoid leaking which emails are registered
+    return HttpErrorHandler.badRequest(
+      req,
+      res,
+      req.i18n.translate('password_reset_email_sent_if_account_exists')
+    )
+  }
+
+  if (!user) {
+    // respond with success message to avoid leaking which emails are registered
+    return HttpErrorHandler.badRequest(
+      req,
+      res,
+      req.i18n.translate('password_reset_email_sent_if_account_exists')
+    )
+  }
+
+  try {
+    await AuthenticationManager.promises.setUserPassword(
+      user, 'resetbyadmin!'
+    )
+  } catch (error) {
+    logger.error(
+      { error },
+      'error setting temporary password during password reset'
+    )
+    // respond with success message to avoid leaking which emails are registered
+    return HttpErrorHandler.badRequest(
+      req,
+      res,
+      req.i18n.translate('password_reset_email_sent_if_account_exists')
+    )
+  }
+
+  await UserAuditLogHandler.promises.addEntry(
+    email,
+    'update-password',
+    req.ip
+  )
+   _sendSecurityAlertPasswordChanged(user)
+
+  await UserSessionsManager.promises.removeSessionsFromRedis(
+    user,
+    req.sessionID // remove all sessions except the current session
+  )
+
+  await OneTimeTokenHandler.promises.expireAllTokensForUser(
+    userId.toString(),
+    'password'
+  )
+
+  return res.json({
+    message: {
+      type: 'success',
+      email: user.email,
+      text: req.i18n.translate('password_change_successful'),
+    },
+  })
+}
+
 async function changePassword(req, res, next) {
   metrics.inc('user.password-change')
   const userId = SessionManager.getLoggedInUserId(req.session)
@@ -517,6 +596,7 @@ async function expireDeletedUsersAfterDuration(req, res, next) {
 
 export default {
   clearSessions: expressify(clearSessions),
+  resetPassword: expressify(resetPassword),
   changePassword: expressify(changePassword),
   tryDeleteUser: expressify(tryDeleteUser),
   subscribe: expressify(subscribe),

@@ -1092,6 +1092,12 @@ async function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AdminController.deleteUser
   )
 
+  webRouter.post(
+    '/admin/resetUserPassword',
+    AuthorizationMiddleware.ensureUserIsSiteAdmin,
+    AdminController.resetUserPassword
+  )
+
   privateApiRouter.get('/perfTest', (req, res) => {
     plainTextResponse(res, 'hello')
   })

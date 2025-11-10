@@ -17,6 +17,7 @@ block content
 										+bookmarkable-tabset-header('open-sockets', 'Open Sockets')
 										+bookmarkable-tabset-header('open-close-editor', 'Open/Close Editor')
 										+bookmarkable-tabset-header('user-management', 'User Management')
+										+bookmarkable-tabset-header('admin-password-reset', 'Password Reset')
 										if hasFeature('saas')
 											+bookmarkable-tabset-header('tpds', 'TPDS/Dropbox Management')
 
@@ -145,3 +146,12 @@ block content
 													option(value='admin') Admin
 											button.btn.btn-primary(type='submit') Create
 
+									.tab-pane(role='tabpanel' id='admin-password-reset')
+										h3 Password Reset
+										p Reset a user's password manually by email.
+										form(method='post' action='/admin/resetUserPassword')
+											input(type='hidden' name='_csrf' value=csrfToken)
+											.form-group
+												label(for='reset-email') User Email
+												input#reset-email.form-control(type='email' name='email' required placeholder='user@example.com')
+											button.btn.btn-warning(type='submit') Reset Password
